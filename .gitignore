@@ -1,3 +1,7 @@
+# 每日发布副本（由 publish_build.py 生成，交给 GitHub Pages 发布）
+ai-intel-public/
+.deploy-worktree/
+
 # 临时校验文件（curl 下载的比对副本等）
 ._*
 

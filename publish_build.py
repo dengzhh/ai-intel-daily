@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 """AI 情报站 · 生成线上发布副本。
 
-把采集结果整理成纯静态站点，输出到 `../ai-intel-public/`。
-该目录只含渲染所需的 html/css/js 与数据，不含 Python 采集代码，
-用于发布到 WorkBuddy 在线站点。
-
-之所以独立成一个目录而不是直接发布项目根：
-宿主机安全策略会拦截「把含源码的本地目录整体上传」的动作，
-而纯静态产物目录可以正常发布。
+把采集结果整理成纯静态站点，输出到 `./ai-intel-public/`（可用
+环境变量 AI_INTEL_PUBLIC_DIR 覆盖）。该目录只含渲染所需的
+html/css/js 与数据，不含 Python 采集代码，用于发布到 GitHub Pages。
 
 历史归档策略：
   为了让「日历查看历史」能翻到更早的日期，每日结果会被追加进
@@ -23,12 +19,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-PUBLIC_DIR = ROOT.parent / "ai-intel-public"
+
+# 发布副本目录。默认放仓库内（供 GitHub Pages 发布），
+# 被 .gitignore 忽略，避免每日产物污染仓库历史。
+# 需要放到别处时用环境变量覆盖。
+PUBLIC_DIR = Path(
+    os.environ.get("AI_INTEL_PUBLIC_DIR") or (ROOT / "ai-intel-public")
+).resolve()
 
 STATIC_FILES = ("index.html", "styles.css", "app.js")
 
