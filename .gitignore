@@ -1,0 +1,23 @@
+# 临时校验文件（curl 下载的比对副本等）
+._*
+
+# 浏览器校验残留
+.playwright-cli/
+*.png
+!assets/*.png
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 日志
+logs/
+*.log
+
+# 编辑器
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

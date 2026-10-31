@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 情报站 · 每日 AI 要闻与开源趋势</title>
+<meta name="description" content="每日从全球知名科技媒体采集 24 小时内最有价值的 12 条 AI 情报，并追踪 GitHub 三日 / 一周 / 一月星数增长最快的开源项目。">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand">
+      <div class="brand-mark">AI</div>
+      <div class="brand-text">
+        <h1>AI 情报站</h1>
+        <p>每日 9:30 自动更新 · 24 小时全球 AI 要闻 + GitHub 开源趋势</p>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-block">
+        <span class="meta-label">数据时间</span>
+        <span class="meta-value" id="genTime">—</span>
+      </div>
+      <div class="meta-block">
+        <span class="meta-label">候选条目</span>
+        <span class="meta-value" id="rawCount">—</span>
+      </div>
+      <button class="refresh-btn" id="refreshBtn" type="button" title="重新加载数据">
+        <span class="refresh-icon">⟳</span> 刷新
+      </button>
+    </div>
+  </div>
+
+  <nav class="header-nav wrap" id="mainNav" role="tablist" aria-label="内容切换">
+    <button class="nav-item active" data-view="news" role="tab" aria-selected="true" type="button">
+      <span class="nav-icon">📰</span> 今日 AI 情报
+      <span class="nav-badge" id="navNewsCount">—</span>
+    </button>
+    <button class="nav-item" data-view="repos" role="tab" aria-selected="false" type="button">
+      <span class="nav-icon">🚀</span> GitHub 开源趋势
+      <span class="nav-badge" id="navRepoCount">—</span>
+    </button>
+    <button class="nav-item" data-view="history" role="tab" aria-selected="false" type="button">
+      <span class="nav-icon">🗓️</span> 历史归档
+      <span class="nav-badge" id="navHistoryCount">—</span>
+    </button>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ 今日 AI 情报 ============ -->
+  <section class="section" id="newsSection" data-view="news">
+    <div class="section-head">
+      <div>
+        <h2>今日 AI 情报 <span class="accent">TOP 12</span></h2>
+        <p class="section-sub">
+          来自 <strong id="sourceCount">—</strong> 个科技媒体与社区，
+          按新鲜度 28% · AI 相关度 27% · 热度 28% · 来源权重 17% 综合打分选出
+        </p>
+      </div>
+      <div class="legend">
+        <span class="legend-item"><i class="dot dot-hot"></i>高分</span>
+        <span class="legend-item"><i class="dot dot-mid"></i>中分</span>
+        <span class="legend-item"><i class="dot dot-low"></i>入围</span>
+      </div>
+    </div>
+
+    <div class="news-grid" id="newsGrid">
+      <div class="skeleton-grid">
+        <div class="skeleton-card"></div><div class="skeleton-card"></div>
+        <div class="skeleton-card"></div><div class="skeleton-card"></div>
+        <div class="skeleton-card"></div><div class="skeleton-card"></div>
+      </div>
+    </div>
+    <div class="empty-state" id="newsEmpty" hidden>暂无数据，请运行 <code>python fetch_daily.py</code> 生成。</div>
+  </section>
+
+  <!-- ============ GitHub 热门开源项目 ============ -->
+  <section class="section" id="repoSection" data-view="repos" hidden>
+    <div class="section-head">
+      <div>
+        <h2>GitHub 热门开源项目 <span class="accent">TOP 12</span></h2>
+        <p class="section-sub">按区间新增星数排序 · <span id="candCount">—</span> 个候选仓库中选出</p>
+      </div>
+      <div class="tabs" id="repoTabs" role="tablist">
+        <button class="tab active" data-period="three_day" role="tab">最近三日</button>
+        <button class="tab" data-period="weekly" role="tab">最近一周</button>
+        <button class="tab" data-period="monthly" role="tab">最近一月</button>
+      </div>
+    </div>
+
+    <div class="repo-table" id="repoTable"></div>
+    <div class="empty-state" id="repoEmpty" hidden>暂无数据。</div>
+
+    <p class="footnote" id="repoNote"></p>
+  </section>
+
+  <!-- ============ 历史归档（日历） ============ -->
+  <section class="section" id="historySection" data-view="history" hidden>
+    <div class="section-head">
+      <div>
+        <h2>历史归档 <span class="accent">逐日回看</span></h2>
+        <p class="section-sub">
+          已归档 <strong id="histDays">—</strong> 天 · 点击日历上有标记的日期查看当天的 12 条情报与开源榜单
+        </p>
+      </div>
+      <div class="tabs" id="histModeTabs" role="tablist" aria-label="历史内容类型">
+        <button class="tab active" data-hist="news" role="tab">情报</button>
+        <button class="tab" data-hist="repos" role="tab">开源项目</button>
+      </div>
+    </div>
+
+    <div class="hist-layout">
+      <!-- 左侧日历 -->
+      <div class="calendar" id="calendar">
+        <div class="cal-head">
+          <button class="cal-nav" id="calPrev" type="button" aria-label="上个月">‹</button>
+          <div class="cal-title" id="calTitle">—</div>
+          <button class="cal-nav" id="calNext" type="button" aria-label="下个月">›</button>
+        </div>
+        <div class="cal-weekdays" id="calWeekdays">
+          <span>一</span><span>二</span><span>三</span><span>四</span>
+          <span>五</span><span>六</span><span>日</span>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-legend">
+          <span class="cal-legend-item"><i class="cal-dot has"></i>有归档</span>
+          <span class="cal-legend-item"><i class="cal-dot sel"></i>当前查看</span>
+          <span class="cal-legend-item"><i class="cal-dot month"></i>本月有归档</span>
+        </div>
+        <div class="cal-foot">
+          <button class="cal-today" id="calToday" type="button">回到今天</button>
+          <div class="month-jump" id="monthJump"></div>
+        </div>
+      </div>
+
+      <!-- 右侧：所选日期的内容 -->
+      <div class="hist-panel">
+        <div class="hist-bar">
+          <div class="hist-date" id="histDate">—</div>
+          <div class="hist-meta" id="histMeta"></div>
+        </div>
+        <div class="news-grid" id="histNewsGrid"></div>
+        <div class="repo-table" id="histRepoTable"></div>
+        <div class="empty-state" id="histEmpty" hidden>
+          这一天没有归档记录。情报站每天 9:30 自动采集一次，请选择日历上标蓝的日期。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>
+      数据来源：TechCrunch AI · The Verge AI · MIT Technology Review · Wired · ZDNet · VentureBeat ·
+      Ars Technica · OpenAI · Google DeepMind · Google AI · Hugging Face · InfoQ（中/英）· 量子位 ·
+      雷锋网 · 少数派 · Hacker News · arXiv
+    </p>
+    <p class="foot-dim">GitHub 数据来源：GitHub Trending 与 GitHub Search API，星数增量为对应区间的新增数。</p>
+  </footer>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
